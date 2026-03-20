@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{{ item.title }} - AgriWealth{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'marketplace:marketplace' %}">Marketplace</a></li>
+      <li class="breadcrumb-item active">{{ item.title|truncatechars:30 }}</li>
+    </ol>
+  </nav>
+  <div class="row g-5">
+    <div class="col-md-7">
+      {% if item.image %}
+      <img src="{{ item.image.url }}" class="img-fluid rounded-3 w-100 mb-4" style="max-height:400px;object-fit:cover;" alt="{{ item.title }}">
+      {% else %}
+      <div class="rounded-3 mb-4 d-flex align-items-center justify-content-center" style="height:300px;background:linear-gradient(135deg,#d8f3dc,#b7e4c7);font-size:5rem;">&#127807;</div>
+      {% endif %}
+      <h2>{{ item.title }}</h2>
+      {% if item.category %}<span class="tag-pill">{{ item.category.icon }} {{ item.category.name }}</span>{% endif %}
+      <span class="badge status-{{ item.status }} ms-2 rounded-pill">{{ item.get_status_display }}</span>
+      <p class="mt-3 text-muted">{{ item.description }}</p>
+      <div class="card p-3 mt-3">
+        <h6>&#127807; Possible Conversion Products</h6>
+        <div class="d-flex flex-wrap gap-2 mt-2">
+          {% for product in item.get_possible_products_list %}
+          <span class="tag-pill">{{ product }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card p-4 mb-3">
+        <h5 class="mb-3">Listing Details</h5>
+        <table class="table table-sm table-borderless">
+          <tr><td class="text-muted">Quantity</td><td class="fw-semibold">{{ item.quantity }} {{ item.get_unit_display }}</td></tr>
+          <tr><td class="text-muted">Location</td><td class="fw-semibold">{{ item.location }}</td></tr>
+          {% if item.price_per_unit %}<tr><td class="text-muted">Price</td><td class="fw-semibold text-success">&#8377;{{ item.price_per_unit }}/{{ item.unit }}</td></tr>{% endif %}
+          <tr><td class="text-muted">Posted</td><td class="fw-semibold">{{ item.created_at|date:"N j, Y" }}</td></tr>
+          <tr><td class="text-muted">Views</td><td class="fw-semibold">{{ item.views_count }}</td></tr>
+        </table>
+      </div>
+      <div class="card p-4 mb-3">
+        <h6>Posted by</h6>
+        <p class="mb-1 fw-semibold">{{ item.farmer.get_full_name|default:item.farmer.username }}</p>
+        {% if item.farmer.location %}<p class="text-muted small"><i class="bi bi-geo-alt"></i> {{ item.farmer.location }}</p>{% endif %}
+        {% if user.is_authenticated and user != item.farmer and user.is_buyer %}
+        <a href="{% url 'chat:start_chat' item.pk %}" class="btn btn-success w-100 rounded-pill mt-2"><i class="bi bi-chat-dots"></i> Contact Farmer</a>
+        {% elif not user.is_authenticated %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-outline-success w-100 rounded-pill mt-2">Login to Contact</a>
+        {% endif %}
+      </div>
+      {% if user == item.farmer %}
+      <div class="d-flex gap-2">
+        <a href="{% url 'marketplace:edit_waste' item.pk %}" class="btn btn-outline-primary flex-fill rounded-pill">Edit</a>
+        <a href="{% url 'marketplace:delete_waste' item.pk %}" class="btn btn-outline-danger flex-fill rounded-pill">Delete</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

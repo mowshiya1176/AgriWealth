@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}AgriBot - AI Farm Assistant{% endblock %}
+{% block extra_css %}
+<style>
+  .chat-area { height: 460px; overflow-y: auto; background: #f8fdf9; padding: 1.5rem; border-radius: 12px; }
+  .bot-bubble { background: white; border-radius: 18px 18px 18px 4px; padding: 12px 16px; max-width: 80%; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+  .user-bubble { background: #2d6a4f; color: white; border-radius: 18px 18px 4px 18px; padding: 12px 16px; max-width: 80%; margin-left: auto; }
+  .typing-dot { width:8px;height:8px;background:#2d6a4f;border-radius:50%;display:inline-block;animation:bounce 1.2s infinite; }
+  .typing-dot:nth-child(2){animation-delay:.2s;}
+  .typing-dot:nth-child(3){animation-delay:.4s;}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+  .suggestion-chip { background: #e8f5e9; color: #2d6a4f; border: 1px solid #b7e4c7; border-radius: 20px; padding: 5px 14px; font-size: .82rem; cursor: pointer; transition: background .2s; display: inline-block; margin: 3px; }
+  .suggestion-chip:hover { background: #b7e4c7; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+      <div class="card">
+        <!-- Header -->
+        <div class="card-header p-3" style="background:linear-gradient(135deg,#1b4332,#2d6a4f);">
+          <div class="d-flex align-items-center gap-3">
+            <div style="width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">&#129302;</div>
+            <div>
+              <h6 class="text-white mb-0">AgriBot</h6>
+              <small style="color:rgba(255,255,255,.7);">AI Agricultural Assistant &bull; Always Online</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="card-body p-0">
+          <div class="chat-area" id="chat-area">
+            <div class="d-flex mb-3">
+              <div class="bot-bubble">
+                <p class="mb-2">&#127807; Hello! I'm <strong>AgriBot</strong>, your AI farming assistant.</p>
+                <p class="mb-2 text-muted small">I can help you with:</p>
+                <ul class="text-muted small mb-0">
+                  <li>Converting farm waste to compost, biofertilizer, or biogas</li>
+                  <li>Farming tips and best practices</li>
+                  <li>Pricing and selling agricultural waste</li>
+                  <li>Identifying waste types and uses</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="px-3 pt-2" id="suggestions">
+          <div class="suggestion-chip" onclick="sendSuggestion(this)">How to make compost?</div>
+          <div class="suggestion-chip" onclick="sendSuggestion(this)">What can I do with rice straw?</div>
+          <div class="suggestion-chip" onclick="sendSuggestion(this)">How to sell my waste?</div>
+          <div class="suggestion-chip" onclick="sendSuggestion(this)">Tell me about biogas</div>
+        </div>
+
+        <!-- Input -->
+        <div class="card-footer p-3">
+          <div class="d-flex gap-2">
+            <input type="text" id="msg-input" class="form-control rounded-pill" placeholder="Ask me anything about farming...">
+            <button id="send-btn" class="btn btn-primary rounded-pill px-4"><i class="bi bi-send"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const chatArea = document.getElementById('chat-area');
+const msgInput = document.getElementById('msg-input');
+const sendBtn = document.getElementById('send-btn');
+let history = [];
+
+function appendMessage(content, isUser) {
+  const div = document.createElement('div');
+  div.className = `d-flex mb-3 ${isUser ? 'justify-content-end' : ''}`;
+  div.innerHTML = `<div class="${isUser ? 'user-bubble' : 'bot-bubble'}">${content}</div>`;
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
+  return div;
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'd-flex mb-3';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<div class="bot-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function hideTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+async function sendMessage(text) {
+  const msg = text || msgInput.value.trim();
+  if (!msg) return;
+  msgInput.value = '';
+  document.getElementById('suggestions').style.display = 'none';
+
+  appendMessage(msg, true);
+  history.push({role: 'user', content: msg});
+  showTyping();
+  sendBtn.disabled = true;
+
+  try {
+    const resp = await fetch('{% url "chatbot:chatbot_api" %}', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+      body: JSON.stringify({message: msg, history: history})
+    });
+    const data = await resp.json();
+    hideTyping();
+    if (data.response) {
+      const formatted = data.response.replace(/\n/g, '<br>');
+      appendMessage(formatted, false);
+      history.push({role: 'assistant', content: data.response});
+    } else {
+      appendMessage('Sorry, something went wrong. Please try again.', false);
+    }
+  } catch(e) {
+    hideTyping();
+    appendMessage('Connection error. Please try again.', false);
+  }
+  sendBtn.disabled = false;
+}
+
+function sendSuggestion(el) { sendMessage(el.textContent); }
+sendBtn.addEventListener('click', () => sendMessage());
+msgInput.addEventListener('keyup', e => { if (e.key === 'Enter') sendMessage(); });
+</script>
+{% endblock %}

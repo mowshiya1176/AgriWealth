@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Messages - AgriWealth{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h3 class="section-title mb-4">Messages</h3>
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      {% for room in rooms %}
+      <a href="{% url 'chat:chat_room' room.id %}" class="text-decoration-none">
+        <div class="card p-3 mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#2d6a4f,#74c69d);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:600;flex-shrink:0;">
+              {{ room.get_other_user.username|first|upper }}
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="mb-0">{{ room.get_other_user.username }}</h6>
+              {% if room.waste_item %}<small class="text-muted">Re: {{ room.waste_item.title|truncatechars:40 }}</small>{% endif %}
+            </div>
+            <small class="text-muted">{{ room.updated_at|timesince }} ago</small>
+          </div>
+        </div>
+      </a>
+      {% empty %}
+      <div class="card p-5 text-center">
+        <div style="font-size:3rem;">&#128172;</div>
+        <p class="text-muted mt-2">No conversations yet.</p>
+        <a href="{% url 'marketplace:marketplace' %}" class="btn btn-primary rounded-pill px-4">Browse Marketplace</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

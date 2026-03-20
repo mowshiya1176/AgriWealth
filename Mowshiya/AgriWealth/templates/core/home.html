@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}AgriWealth - Turn Farm Waste into Wealth{% endblock %}
+{% block content %}
+
+<!-- Hero Section -->
+<section style="background:linear-gradient(135deg,#1b4332 0%,#2d6a4f 50%,#40916c 100%);min-height:88vh;display:flex;align-items:center;" class="text-white">
+  <div class="container py-5">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="badge bg-warning text-dark rounded-pill px-3 py-2 mb-3" style="font-size:.85rem;">&#127807; Sustainable Agriculture Platform</span>
+        <h1 style="font-family:'Playfair Display',serif;font-size:3.2rem;line-height:1.2;" class="mb-4">
+          Turn Farm Waste<br>Into <span style="color:#f4a261;">Wealth</span>
+        </h1>
+        <p class="lead mb-4" style="color:rgba(255,255,255,.85);font-size:1.15rem;">
+          AgriWealth connects farmers with buyers to convert agricultural waste into valuable products — compost, biofertilizer, biogas, and more. Earn from what you would otherwise discard.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          {% if not user.is_authenticated %}
+          <a href="{% url 'accounts:register' %}" class="btn btn-accent btn-lg px-4 rounded-pill">Get Started Free</a>
+          {% endif %}
+          <a href="{% url 'marketplace:marketplace' %}" class="btn btn-outline-light btn-lg px-4 rounded-pill">Browse Marketplace</a>
+        </div>
+        <div class="row mt-5 g-3">
+          <div class="col-4 text-center">
+            <h3 style="color:#f4a261;font-weight:700;">{{ stats.total_listings }}+</h3>
+            <small style="color:rgba(255,255,255,.7);">Listings</small>
+          </div>
+          <div class="col-4 text-center">
+            <h3 style="color:#f4a261;font-weight:700;">{{ stats.categories }}+</h3>
+            <small style="color:rgba(255,255,255,.7);">Waste Types</small>
+          </div>
+          <div class="col-4 text-center">
+            <h3 style="color:#f4a261;font-weight:700;">100%</h3>
+            <small style="color:rgba(255,255,255,.7);">Sustainable</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="row g-3">
+          <div class="col-6"><div class="card p-4 text-center h-100" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px);"><div style="font-size:2.5rem;">&#127807;</div><h6 class="text-white mt-2">Compost</h6><small style="color:rgba(255,255,255,.7);">Rich organic fertilizer</small></div></div>
+          <div class="col-6"><div class="card p-4 text-center h-100" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px);"><div style="font-size:2.5rem;">&#9851;</div><h6 class="text-white mt-2">Biofertilizer</h6><small style="color:rgba(255,255,255,.7);">Boost soil nutrients</small></div></div>
+          <div class="col-6"><div class="card p-4 text-center h-100" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px);"><div style="font-size:2.5rem;">&#9889;</div><h6 class="text-white mt-2">Biogas</h6><small style="color:rgba(255,255,255,.7);">Clean energy source</small></div></div>
+          <div class="col-6"><div class="card p-4 text-center h-100" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px);"><div style="font-size:2.5rem;">&#128004;</div><h6 class="text-white mt-2">Animal Feed</h6><small style="color:rgba(255,255,255,.7);">Processed crop residue</small></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5 bg-white">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <h2 class="section-title display-6">How AgriWealth Works</h2>
+      <p class="text-muted">Three simple steps to turn waste into income</p>
+    </div>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="p-4">
+          <div style="width:70px;height:70px;background:#d8f3dc;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.8rem;">&#128221;</div>
+          <h5>1. List Your Waste</h5>
+          <p class="text-muted">Farmers register and list their agricultural waste with details like type, quantity, and location.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4">
+          <div style="width:70px;height:70px;background:#fdebd0;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.8rem;">&#128269;</div>
+          <h5>2. Buyers Discover</h5>
+          <p class="text-muted">Buyers browse the marketplace, search by waste type, and find products that match their needs.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4">
+          <div style="width:70px;height:70px;background:#e8f5e9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.8rem;">&#129297;</div>
+          <h5>3. Connect & Trade</h5>
+          <p class="text-muted">Use our built-in chat to negotiate prices and complete the transaction directly on the platform.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Listings -->
+{% if featured_items or recent_items %}
+<section class="py-5">
+  <div class="container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="section-title mb-0">Latest Listings</h2>
+      <a href="{% url 'marketplace:marketplace' %}" class="btn btn-outline-success rounded-pill">View All <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+      {% for item in recent_items %}
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+          {% if item.image %}
+          <img src="{{ item.image.url }}" class="card-img-top" style="height:180px;object-fit:cover;border-radius:12px 12px 0 0;" alt="{{ item.title }}">
+          {% else %}
+          <div style="height:180px;background:linear-gradient(135deg,#d8f3dc,#b7e4c7);display:flex;align-items:center;justify-content:center;border-radius:12px 12px 0 0;font-size:3rem;">&#127807;</div>
+          {% endif %}
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h6 class="card-title mb-0">{{ item.title|truncatechars:35 }}</h6>
+              <span class="badge status-{{ item.status }} rounded-pill small">{{ item.get_status_display }}</span>
+            </div>
+            <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> {{ item.location|truncatechars:30 }}</p>
+            <p class="text-muted small mb-3">{{ item.description|truncatechars:70 }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted"><i class="bi bi-box"></i> {{ item.quantity }} {{ item.unit }}</small>
+              <a href="{% url 'marketplace:waste_detail' item.pk %}" class="btn btn-sm btn-primary rounded-pill">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-5">
+        <p class="text-muted">No listings yet. <a href="{% url 'accounts:register' %}">Be the first to list!</a></p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Categories -->
+{% if categories %}
+<section class="py-5 bg-white">
+  <div class="container py-3">
+    <h2 class="section-title text-center mb-4">Browse by Category</h2>
+    <div class="row g-3 justify-content-center">
+      {% for cat in categories %}
+      <div class="col-6 col-md-3 col-lg-2">
+        <a href="{% url 'marketplace:marketplace' %}?category={{ cat.id }}" class="text-decoration-none">
+          <div class="card text-center p-3">
+            <div style="font-size:2rem;">{{ cat.icon }}</div>
+            <small class="text-muted mt-1">{{ cat.name }}</small>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+{% if not user.is_authenticated %}
+<section style="background:linear-gradient(135deg,#f4a261,#e76f51);" class="py-5 text-white">
+  <div class="container text-center py-3">
+    <h2 style="font-family:'Playfair Display',serif;">Ready to Turn Waste into Income?</h2>
+    <p class="lead mb-4">Join thousands of farmers already earning from their agricultural waste.</p>
+    <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-5 rounded-pill text-success fw-bold">Start for Free</a>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

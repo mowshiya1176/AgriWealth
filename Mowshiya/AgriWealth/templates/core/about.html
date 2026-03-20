@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}About - AgriWealth{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 text-center">
+      <h1 class="section-title display-5 mb-3">About AgriWealth</h1>
+      <p class="lead text-muted mb-5">We believe every gram of farm waste holds untapped value.</p>
+    </div>
+  </div>
+  <div class="row g-4 mb-5">
+    <div class="col-md-6"><div class="card p-4 h-100"><h5><i class="bi bi-bullseye text-success"></i> Our Mission</h5><p class="text-muted">To create a sustainable agricultural ecosystem where farm waste is never discarded but transformed into valuable products, generating income for farmers and reducing environmental pollution.</p></div></div>
+    <div class="col-md-6"><div class="card p-4 h-100"><h5><i class="bi bi-eye text-success"></i> Our Vision</h5><p class="text-muted">A world where every farmer earns from their waste, where soil is healthier, air is cleaner, and rural communities thrive through circular agricultural economies.</p></div></div>
+  </div>
+  <div class="text-center mt-5">
+    <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-5 rounded-pill">Join AgriWealth Today</a>
+  </div>
+</div>
+{% endblock %}

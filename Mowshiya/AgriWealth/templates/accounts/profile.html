@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Profile - {{ profile_user.username }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        {% if profile_user.profile_image %}
+          <img src="{{ profile_user.profile_image.url }}" class="rounded-circle mb-3 mx-auto" style="width:100px;height:100px;object-fit:cover;" alt="Profile">
+        {% else %}
+          <div style="width:100px;height:100px;background:linear-gradient(135deg,#2d6a4f,#74c69d);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:white;margin:0 auto 1rem;">{{ profile_user.username|first|upper }}</div>
+        {% endif %}
+        <h5>{{ profile_user.get_full_name|default:profile_user.username }}</h5>
+        <span class="badge {% if profile_user.is_farmer %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill">{{ profile_user.get_role_display }}</span>
+        {% if profile_user.location %}<p class="text-muted small mt-2"><i class="bi bi-geo-alt"></i> {{ profile_user.location }}</p>{% endif %}
+        {% if profile_user.bio %}<p class="text-muted small">{{ profile_user.bio }}</p>{% endif %}
+        <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-success btn-sm rounded-pill mt-2">Edit Profile</a>
+      </div>
+    </div>
+    <div class="col-md-8">
+      {% if listings %}
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0">My Listings</h5>
+        <a href="{% url 'marketplace:add_waste' %}" class="btn btn-sm btn-primary rounded-pill"><i class="bi bi-plus"></i> Add New</a>
+      </div>
+      <div class="row g-3">
+        {% for item in listings %}
+        <div class="col-md-6">
+          <div class="card p-3">
+            <div class="d-flex justify-content-between">
+              <h6 class="mb-1">{{ item.title|truncatechars:30 }}</h6>
+              <span class="badge status-{{ item.status }} small rounded-pill">{{ item.get_status_display }}</span>
+            </div>
+            <small class="text-muted">{{ item.quantity }} {{ item.unit }} &bull; {{ item.location }}</small>
+            <div class="mt-2 d-flex gap-2">
+              <a href="{% url 'marketplace:waste_detail' item.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">View</a>
+              <a href="{% url 'marketplace:edit_waste' item.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill">Edit</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="card p-5 text-center">
+          <div style="font-size:3rem;">&#128588;</div>
+          <p class="text-muted mt-2">No listings yet.</p>
+          {% if profile_user.is_farmer %}<a href="{% url 'marketplace:add_waste' %}" class="btn btn-primary rounded-pill px-4">List Your First Waste Item</a>{% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
